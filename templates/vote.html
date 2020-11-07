@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Vote for the {{election.title}}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {% for position, candidates in position_candidates.items %}
+            <h3>{{position.name}}</h3>
+            <p>Seats: {{position.seats}}</p>
+            <fieldset>
+                {% for candidate in candidates %}
+                <input type="radio" name="{{position.name}}" value="{{candidate.pk}}">
+                <label for="{{candidate.pk}}">{{candidate.first_name}} {{candidate.last_name}} | {{candidate.party}}</label><br>
+                {% empty %}
+                    <p>No candidates have been added to this position yet.</p>
+                {% endfor %}
+            </fieldset>
+        {% endfor %}
+        <button type="submit">Vote</button>
+    </form>
+{% endblock content %}
