@@ -29,17 +29,26 @@ def login(request):
     return render(request, 'login.html', context)
 
 @login_required(login_url='login')
+def results(request, pk):
+    election = Election.objects.get(id=pk)
+    positions = election.position_set.all()
+    position_candidates = {}
+    for position in positions:
+        position_candidates[position] = position.candidate_set.all()
+    context = {'election': election, 'position_candidates': position_candidates}
+    return render(request, 'results.html', context)
+
+@login_required(login_url='login')
 def vote(request, pk):
     user = User.objects.get(id=request.user.pk)
     if (user.elections.all().filter(pk=pk).exists()):
-        return HttpResponse('You have already voted in this election.')
+        return redirect('results', pk=pk)
     election = Election.objects.get(id=pk)
     positions = election.position_set.all()
     position_candidates = {}
     for position in positions:
         position_candidates[position] = position.candidate_set.all()
     if request.method == 'POST':
-        print(request.POST)
         for position in positions:
             if request.POST.get(position.name) is None:
                 continue

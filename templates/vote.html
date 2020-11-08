@@ -6,7 +6,6 @@
         {% csrf_token %}
         {% for position, candidates in position_candidates.items %}
             <h3>{{position.name}}</h3>
-            <p>Seats: {{position.seats}}</p>
             <fieldset>
                 {% for candidate in candidates %}
                 <input type="radio" name="{{position.name}}" value="{{candidate.pk}}">

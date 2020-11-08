@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Results for the {{election.title}}</h1>
+    {% for position, candidates in position_candidates.items %}
+        <h3>{{position.name}}</h3>
+        {% for candidate in candidates %}
+        <p>{{candidate.first_name}} {{candidate.last_name}} | {{candidate.party}}</p>
+        <p>Votes: {{candidate.votes}}</p><br>
+        {% empty %}
+            <p>No results are in for this position yet.</p>
+        {% endfor %}
+    {% endfor %}
+{% endblock content %}

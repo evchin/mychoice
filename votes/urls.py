@@ -9,6 +9,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('vote/<str:pk>', views.vote, name='vote'),
+    path('results/<str:pk>', views.results, name='results'),
 
     path('elections/', views.electionList, name='election-list'),
     path('elections/create/', views.electionCreate, name='election-create'),
