@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -14,59 +14,52 @@ from .decorators import unauthenticated_user, official_only
 from .models import Candidate, Election, User, Position
 from .forms import UserCreationForm
 
+@api_view(['POST'])
 @unauthenticated_user
 def login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.data.get('username')
+        password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('home')
-        else:
-            messages.info(request, 'Username OR password is incorrect')
-    context = {}
-    return render(request, 'login.html', context)
+            serializer = UserSerializer(user, many=False)
+            return Response(serializer.data)
+    return JsonResponse({'response': 'Username OR password is incorrect.'})
 
+@api_view(['GET'])
 @login_required(login_url='login')
 def results(request, pk):
     election = Election.objects.get(id=pk)
-    positions = election.position_set.all()
-    position_candidates = {}
-    for position in positions:
-        position_candidates[position] = position.candidate_set.all()
-    context = {'election': election, 'position_candidates': position_candidates}
-    return render(request, 'results.html', context)
+    serializer = ElectionSerializer(election, many=False)
+    return Response(serializer.data)
 
+@api_view(['GET', 'POST'])
 @login_required(login_url='login')
 def vote(request, pk):
     user = User.objects.get(id=request.user.pk)
     if (user.elections.all().filter(pk=pk).exists()):
         return redirect('results', pk=pk)
-    election = Election.objects.get(id=pk)
-    positions = election.position_set.all()
-    position_candidates = {}
-    for position in positions:
-        position_candidates[position] = position.candidate_set.all()
     if request.method == 'POST':
-        for position in positions:
-            if request.POST.get(position.name) is None:
-                continue
-            candidate = Candidate.objects.get(id=request.POST[position.name])
+        for pos, can in request.data.items():
+            position = Position.objects.get(id=pos)
+            candidate = Candidate.objects.get(id=can)
             candidate.votes = candidate.votes + 1
             candidate.save()
-        user.elections.add(election)
-        return HttpResponse("Your vote has been confirmed.")
-    context = {'election': election, 'position_candidates': position_candidates}
-    return render(request, 'vote.html', context)
+        return redirect('results', pk=pk)
+    election = Election.objects.get(id=pk)
+    serializer = ElectionSerializer(election, many=False)
+    return Response(serializer.data)
 
+@api_view(['GET'])
+@login_required(login_url='login')
 def home(request):
-    context = {'user': request.user}
-    return render(request, 'home.html', context)
+    serializer = UserSerializer(request.user, many=False)
+    return Response(serializer.data)
 
 def logout(request):
 	auth.logout(request)
-	return redirect('login')
+	return JsonResponse({'response': 'User has been logged out.'})
 
 @unauthenticated_user
 @api_view(['POST'])
