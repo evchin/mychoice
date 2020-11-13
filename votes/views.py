@@ -28,14 +28,14 @@ def login(request):
     return JsonResponse({'response': 'Username OR password is incorrect.'})
 
 @api_view(['GET'])
-# @login_required(login_url='login')
+@login_required(login_url='login')
 def results(request, pk):
     election = Election.objects.get(id=pk)
     serializer = ElectionSerializer(election, many=False)
     return Response(serializer.data)
 
 @api_view(['GET', 'POST'])
-# @login_required(login_url='login')
+@login_required(login_url='login')
 def vote(request, pk):
     user = User.objects.get(id=request.user.pk)
     if (user.elections.all().filter(pk=pk).exists()):
@@ -52,7 +52,7 @@ def vote(request, pk):
     return Response(serializer.data)
 
 @api_view(['GET'])
-# @login_required(login_url='login')
+@login_required(login_url='login')
 def home(request):
     serializer = UserSerializer(request.user, many=False)
     return Response(serializer.data)
@@ -83,8 +83,8 @@ def electionDetail(request, pk):
     serializer = ElectionSerializer(election, many=False, context={'positions': election.position_set})
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['POST'])
 def electionCreate(request):
     serializer = ElectionSerializer(data=request.data)
@@ -92,8 +92,8 @@ def electionCreate(request):
         serializer.save()
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['POST'])
 def electionUpdate(request, pk):
     election = Election.objects.get(id=pk)
@@ -102,8 +102,8 @@ def electionUpdate(request, pk):
         serializer.save()
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['DELETE'])
 def electionDelete(request, pk):
     election = Election.objects.get(id=pk)
@@ -132,8 +132,8 @@ def positionDetail(request, pk):
     serializer = PositionSerializer(position, many=False)
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['POST'])
 def positionCreate(request, pk):
     election = Election.objects.get(id=pk)
@@ -142,8 +142,8 @@ def positionCreate(request, pk):
         serializer.save()
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['POST'])
 def positionUpdate(request, pk):
     position = Position.objects.get(id=pk)
@@ -152,8 +152,8 @@ def positionUpdate(request, pk):
         serializer.save()
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['DELETE'])
 def positionDelete(request, pk):
     position = Position.objects.get(id=pk)
@@ -181,8 +181,8 @@ def candidateDetail(request, pk):
     serializer = CandidateSerializer(candidate, many=False)
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['POST'])
 def candidateCreate(request):
     serializer = CandidateSerializer(data=request.data)
@@ -190,8 +190,8 @@ def candidateCreate(request):
         serializer.save()
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['POST'])
 def candidateUpdate(request, pk):
     candidate = Candidate.objects.get(id=pk)
@@ -202,8 +202,8 @@ def candidateUpdate(request, pk):
         Response('There was an error with your update.')
     return Response(serializer.data)
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['DELETE'])
 def candidateDelete(request, pk):
     candidate = Candidate.objects.get(id=pk)
@@ -212,15 +212,15 @@ def candidateDelete(request, pk):
 
 # USERS
 
-# @login_required(login_url='login')
-# @official_only
+@login_required(login_url='login')
+@official_only
 @api_view(['GET'])
 def userList(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
-# @login_required(login_url='login')
+@login_required(login_url='login')
 @api_view(['POST'])
 def userUpdate(request):
     user = User.objects.get(id=request.user.pk)
@@ -231,14 +231,14 @@ def userUpdate(request):
         Response('There was an error with your update.')
     return Response(serializer.data)
 
-# @login_required(login_url='login')
+@login_required(login_url='login')
 @api_view(['GET'])
 def userDetail(request):
     user = User.objects.get(id=request.user.pk)
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
 
-# @login_required(login_url='login')
+@login_required(login_url='login')
 @api_view(['DELETE'])
 def userDelete(request):
     user = User.objects.get(id=request.user.pk)
