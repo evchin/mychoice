@@ -37,9 +37,9 @@ def results(request, pk):
 @api_view(['GET', 'POST'])
 # @login_required(login_url='login')
 def vote(request, pk):
-    user = User.objects.get(id=request.user.pk)
-    if (user.elections.all().filter(pk=pk).exists()):
-        return redirect('results', pk=pk)
+    # user = User.objects.get(id=request.user.pk)
+    # if (user.elections.all().filter(pk=pk).exists()):
+    #     return redirect('results', pk=pk)
     if request.method == 'POST':
         for pos, can in request.data.items():
             position = Position.objects.get(id=pos)
